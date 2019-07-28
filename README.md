@@ -1,5 +1,16 @@
 # SIH-Raijin-Trinity
 
+## Authors
+
+Tracy Chew (Sydney Informatics Hub, University of Sydney)
+Andrey Bliznyuk (National Computational Infrastructure)
+Rika Kobayashi (National Computational Infrastructure)
+
+Please acknowledge us and show your support!
+
+Suggested acknowledgement: "The authors acknowledge the scientific and/or technical assistance of Tracy Chew of the Sydney Informatics Hub at the University of Sydney and use of the National Computational Infrastructure facility."
+
+
 ## Background
 
 [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki) assembles Illumina RNA-Seq data into transcript sequences. Trinity was developed at the Broad Institute and the Hebrew Univervity of Jerusalem. 
