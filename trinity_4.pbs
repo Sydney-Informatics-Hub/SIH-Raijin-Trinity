@@ -4,7 +4,21 @@
 ## Involves Inchworm, Chysalis and Butterfly
 ## Chrysalis and Butterfly can be executed in parallel, each having
 ## independant input/output
+## Authors: Tracy Chew, Andrey Bliznyuk, Rika Kobayashi
+## Suggested acknowledgement: "The authors acknowledge the scientific and/or technical 
+## assistance of Tracy Chew of the Sydney Informatics Hub at the University of Sydney 
+## and use of the National Computational Infrastructure facility."
 ## ---------------------------------------------------------------------------
+
+module load samtools/1.9
+module load java/jdk1.8.0_60
+module load bowtie2/2.3.3.1
+module load jellyfish/2.2.6
+module load salmon/0.11.0
+module load perl/5.22.1
+module load trinity/2.8.4
+module load python3/3.6.7
+module load parallel/20190322
 
 finish(){
 	echo "$(date) : Copying data back to /short from jobFS from each node..."
