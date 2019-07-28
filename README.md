@@ -12,21 +12,15 @@ SIH-Raijin-Trinity allows Trinity to be scalable by enabling use of multiple nod
 
 The following software needs to be installed and loaded as modules:
 
-samtools/1.9
+        samtools/1.9
+        java/jdk1.8.0_60
+        bowtie2/2.3.3.1
+        jellyfish/2.2.6
+        salmon/0.11.0
+        perl/5.22.1
+        trinity/2.8.4
+        python3/3.6.7
 
-java/jdk1.8.0_60
-
-bowtie2/2.3.3.1
-
-jellyfish/2.2.6
-
-salmon/0.11.0
-
-perl/5.22.1
-
-trinity/2.8.4
-
-python3/3.6.7
 
 ### Input
 
