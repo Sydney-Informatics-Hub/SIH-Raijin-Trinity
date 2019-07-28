@@ -1,0 +1,45 @@
+#! /bin/bash
+## ---------------------------------------------------------------------------
+## TRINITY 5 - FINAL ASSEMBLY
+## Harvesting all assembled transcripts into a single multi-fasta file...
+## ---------------------------------------------------------------------------
+
+# Set trap
+# EXIT runs on any exit, signalled or not.
+finish(){
+	# archive trinity_outdir after completing compute in ${PBS_JOBFS} and save to ${out} or /short
+	# clean up and remove trinity_outdir from ${PBS_JOBFS}
+	cd ${PBS_JOBFS}
+	tar -cf ${out}/trinity_outdir_complete.tar trinity_outdir
+	rm -rf ${TRINITY_OUTDIR}
+	# Unpack final output into a single directory and clean up
+	cd ${out}
+	tar -xf trinity_outdir_complete.tar
+	tar -xf trinity_outdir_4.tar
+	rm -rf trinity_outdir_*
+	rm -rf trinity_workdir_*
+	echo "$(date) : Finished trinity_5.pbs"
+}
+trap finish EXIT
+
+echo "$(date) : Beginning trinity_5.pbs: Harvest reads into a final assembly"
+
+export TRINITY_OUTDIR=${PBS_JOBFS}/trinity_outdir/${tissue}_trinity_2.8.4
+mkdir -p ${TRINITY_OUTDIR}
+cd ${TRINITY_OUTDIR}
+echo "Currently in ${TRINITY_OUTDIR}"
+
+# Collect de novo assemblies from each of the nodes used
+# cpu_per_node used in trinity_4.pbs (($PBS_NCPUS/cpu_per_node))
+for ((i=0;i<${nodes_used};i++));
+do
+	tar -xf ${out}/trinity_outdir_4_${i}.tar
+done
+
+echo `date` ": ** Harvesting all assembled transcripts into a single multi-fasta file..."
+find read_partitions/ -name '*inity.fasta'  | /short/er01/apps/trinity/2.8.4/util/support_scripts/partitioned_trinity_aggregator.pl --token_prefix TRINITY_DN --output_prefix Trinity.tmp
+mv Trinity.tmp.fasta Trinity.fasta
+/short/er01/apps/trinity/2.8.4/util/support_scripts/get_Trinity_gene_to_trans_map.pl Trinity.fasta > Trinity.fasta.gene_trans_map
+
+# Now we have Trinity.fasta let's delete read_partitions
+rm -rf read_partitions

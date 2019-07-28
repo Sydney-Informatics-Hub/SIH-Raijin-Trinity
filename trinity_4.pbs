@@ -1,0 +1,103 @@
+#!/bin/bash
+## ---------------------------------------------------------------------------
+## TRINITY 4 - ASSEMBLING CLUSTERS OF READS
+## Involves Inchworm, Chysalis and Butterfly
+## Chrysalis and Butterfly can be executed in parallel, each having
+## independant input/output
+## ---------------------------------------------------------------------------
+
+finish(){
+	echo "$(date) : Copying data back to /short from jobFS from each node..."
+	cd ${out}
+	FILE="${out}/copy_data_back.sh"
+
+	# Write contents between EOM to copy_data_back.sh
+	# Archives read_paritions for node i into trinity_outdir_4_$i.tar
+	# Removes read paritions from ${PBS_JOBFS}/trinity_outdir/${tissue}_trinity_2.8.4
+	# Archives everything else minus read_paritions, copies this to trinity_outdir_
+	/bin/cat <<EOM >${FILE}
+#!/bin/bash
+echo Copying data back from node \$1
+io=${io}
+tissue=${tissue}
+out=${io}/trinity/${tissue}
+cd \${PBS_JOBFS}/trinity_outdir/${tissue}_trinity_2.8.4
+tar -cf ${out}/trinity_outdir_4_\$1.tar read_partitions
+EOM
+
+	# Change permissions to allow execution of script created
+	chmod +x ${out}/copy_data_back.sh
+
+        for(( i=0; i<${PBS_NCPUS}; i+= ${cpu_per_node} ))
+        do
+        	pbsdsh -n ${i} ${out}/copy_data_back.sh $(( ${i}/${cpu_per_node})) &
+        done
+
+	# Synchronisation point - wait for all nodes to complete their tasks
+        wait
+
+	echo "$(date) : Cleaning up data..."
+
+	# Once read paritions from all directories have been copied back,
+	# Remove the read_paritions dir
+	# copy everything else in ${tissue}_trinity_2.8.4
+	rm -rf ${PBS_JOBFS}/trinity_outdir/${tissue}_trinity_2.8.4/read_partitions
+
+	echo "$(date) : Archiving..."
+	cd ${PBS_JOBFS}
+	tar -cf ${out}/trinity_outdir_4.tar trinity_outdir
+
+	# Clean up
+	rm -rf ${out}/copy_data_back.sh
+
+	echo "$(date) : Finished trinity_4.pbs"
+}
+trap finish EXIT
+
+echo "$(date) : Beginning trinity_4.pbs: Assemble clusters of reads in parallel"
+
+# Create copy script to execute for each node
+FILE="${out}/copy_data_to.sh"
+/bin/cat <<EOM >$FILE
+#!/bin/bash
+echo Copying data to node \$1
+# Set variables
+io=${io}
+tissue=${tissue}
+out=${io}/trinity/${tissue}
+mkdir ${PBS_JOBFS}/trinity_workdir
+tar -xf ${out}/trinity_outdir_3.tar -C ${PBS_JOBFS}
+EOM
+
+chmod +x ${out}/copy_data_to.sh
+
+# pbsdash (pbs distributed shell) distributes tasks across nodes
+# jobs will always be allocated all cpus in a node
+# Task is: extract trinity_outdir.tar to ${PBS_JOBFS} for each node
+# & puts tar command in the background so tar uploads are done simultaneously for
+
+for(( i=0; i<${PBS_NCPUS}; i+= ${cpu_per_node} ))
+do
+	pbsdsh -n ${i} ${out}/copy_data_to.sh $(( ${i}/${cpu_per_node})) &
+done
+
+wait
+
+export TRINITY_OUTDIR=${PBS_JOBFS}/trinity_outdir
+cd ${TRINITY_OUTDIR}
+
+# Re-write "partitioned_reads.files.list" so it has the correct paths
+echo `date` ": Updating paths for partitioned_reads.files.list"
+find ${PWD}/ -iname '*trinity.reads.fa' > ${tissue}_trinity_2.8.4/partitioned_reads.files.list
+# Re-write "recursive_trinity.cmds" so that it has correct paths
+echo `date` ": Updating paths for ${tissue}_trinity_2.8.4/recursive_trinity.cmds"
+sed -i -e 's|\/jobfs\/local\/[0-9]\+\.r-man2|'${TMPDIR}'|g' ${tissue}_trinity_2.8.4/recursive_trinity.cmds
+
+# Run phase 2 of trinity
+# Commands are distrubuted once at a time (via pipe, stored in {%}
+# GNU parallel executes commands across nodes
+echo `date` ": Assemble clustered reads using GNU parallel"
+cat ${tissue}_trinity_2.8.4/recursive_trinity.cmds | parallel -j ${PBS_NCPUS} pbsdsh -n {%} -- bash -l -c '{}'
+
+# Clean up
+rm -rf ${out}/copy_data_to.sh

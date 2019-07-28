@@ -1,0 +1,51 @@
+#! /bin/bash
+
+## ---------------------------------------------------------------------------
+## TRINITY 3 - CHRYSALIS (not distributed)
+## Run Chrysalis, stop before parallel assembly of clustered reads
+## ---------------------------------------------------------------------------
+
+# Set trap
+# EXIT runs on any exit, signalled or not.
+finish(){
+	echo "$(date) : Archiving trinity workdir/outdir and copying to /short"
+	cd ${PBS_JOBFS}
+	tar -cf ${out}/trinity_workdir_3.tar trinity_workdir
+	tar -cf ${out}/trinity_outdir_3.tar trinity_outdir
+	rm -rf ${TRINITY_WORKDIR}
+	rm -rf ${TRINITY_OUTDIR}
+	echo "$(date) : Finished archiving trinity_3.pbs"
+}
+trap finish EXIT
+
+# Set variables
+first=$(awk -v taskID=${input} '$1==taskID {print $2}' ${list})
+second=$(awk -v taskID=${input} '$1==taskID {print $3}' ${list})
+
+echo "$(date) : Beginning trinity_3.pbs: Cluster Inchworm contigs with Chrysalis"
+
+# Unpack tmpdir tar from trinity_2.pbs into jobfs space
+tar -xf ${out}/trinity_workdir_2.tar -C ${PBS_JOBFS}
+export TRINITY_WORKDIR=${PBS_JOBFS}/trinity_workdir
+
+# Unpack outdir tar into jobfs space
+tar -xf ${out}/trinity_outdir_2.tar -C ${PBS_JOBFS}
+export TRINITY_OUTDIR=${PBS_JOBFS}/trinity_outdir
+
+cd ${TRINITY_OUTDIR}
+
+# Run trinity, stop before assembling clustered reads
+Trinity --seqType ${seqtype} \
+	--max_memory ${mem} \
+	--no_version_check \
+	--left ${first} \
+	--right ${second} \
+	--no_normalize_reads \
+	--CPU ${PBS_NCPUS} \
+	--workdir ${TRINITY_WORKDIR} \
+	--output ${tissue}_trinity_2.8.4 \
+	--monitoring \
+	--verbose \
+	--no_distributed_trinity_exec
+
+echo "$(date) : Finished trinity_3.pbs"

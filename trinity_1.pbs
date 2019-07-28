@@ -1,0 +1,54 @@
+#! /bin/bash
+
+## ---------------------------------------------------------------------------
+## TRINITY 1 - KMER COUNTING
+## Generate the k-mer catalog using Jellyfish
+## ---------------------------------------------------------------------------
+
+# Set trap
+# EXIT runs on any exit, signalled or not.
+finish(){
+	echo "$(date) : Archiving trinity workdir/outdir and copying to /short"
+	cd ${PBS_JOBFS}
+	tar -cf ${out}/trinity_workdir_1.tar trinity_workdir
+	tar -cf ${out}/trinity_outdir_1.tar trinity_outdir
+	rm -rf ${TRINITY_WORKDIR}
+	rm -rf ${TRINITY_OUTDIR}
+	echo "$(date) : Finished archiving trinity_workdir_1 and trinity_outdir_1"
+}
+trap finish EXIT
+
+# Set variables
+first=$(awk -v taskID=${input} '$1==taskID {print $2}' ${list})
+second=$(awk -v taskID=${input} '$1==taskID {print $3}' ${list})
+
+echo "$(date) : Beginning trinity_1.pbs: KMER counting with Jellyfish"
+
+# Create TEMP directory in JOBFS
+export TRINITY_WORKDIR=${PBS_JOBFS}/trinity_workdir
+mkdir -p ${TRINITY_WORKDIR}
+
+# Create output directory in JOBFS
+export TRINITY_OUTDIR=${PBS_JOBFS}/trinity_outdir
+mkdir -p ${TRINITY_OUTDIR}
+
+# Make output directory in short, later save tmpdir and outdir tars here
+mkdir -p ${out}
+
+# Move to jobfs for outdir
+cd ${TRINITY_OUTDIR}
+
+# Run trinity, stop after inchworm, do not run chrysalis
+Trinity --seqType ${seqtype} \
+	--max_memory ${mem} \
+	--no_version_check \
+	--left ${first} \
+	--right ${second} \
+	--no_normalize_reads \
+	--CPU ${cpus} \
+	--workdir ${TRINITY_WORKDIR} \
+	--output ${tissue}_trinity_2.8.4 \
+	--verbose \
+	--no_run_inchworm
+
+echo "$(date) : Finished trinity_1"
