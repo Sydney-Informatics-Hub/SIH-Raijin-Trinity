@@ -36,7 +36,7 @@ A __fastq.list__ file can be easily created by:
 
 Once you have set the variables (project, list, seqtype) in __trinity_phases.sh__, simply run the workflow by:
 
-`sh trinity_phases.sh`
+        sh trinity_phases.sh
 
 ### Overview
 
