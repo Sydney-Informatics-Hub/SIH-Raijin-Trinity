@@ -3,8 +3,11 @@
 ## Authors
 
 Tracy Chew (Sydney Informatics Hub, University of Sydney)
+
 Andrey Bliznyuk (National Computational Infrastructure)
+
 Rika Kobayashi (National Computational Infrastructure)
+
 
 Please acknowledge us and show your support!
 
