@@ -21,7 +21,7 @@ SIH-Raijin-Trinity allows Trinity to be scalable by enabling use of multiple nod
 
 ### Software requirements
 
-The following software needs to be installed and loaded as modules:
+The following software needs to be installed and loadable as modules:
 
         samtools/1.9
         java/jdk1.8.0_60
