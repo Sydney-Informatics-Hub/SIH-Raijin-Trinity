@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# This will launch trinity for all samples listed in a fastq.list file.
-# Trinity is run 5 parts
+## ---------------------------------------------------------------------------
+## This will launch trinity for all samples listed in a fastq.list file.
+## Trinity is run 5 parts
+## Authors: Tracy Chew, Andrey Bliznyuk, Rika Kobayashi
+## Suggested acknowledgement: "The authors acknowledge the scientific and/or technical 
+## assistance of Tracy Chew of the Sydney Informatics Hub at the University of Sydney 
+## and use of the National Computational Infrastructure facility."
+## ---------------------------------------------------------------------------
 
 # Set variables
 project=<project>
