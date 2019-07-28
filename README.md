@@ -51,7 +51,7 @@ Once you have set the variables (project, list, seqtype) in __trinity_phases.sh_
 
 ### Overview
 
-`trinity_phases.sh` runs trinity in 5 phases. Each phase is launched as an independant pbs script. This enhances compute efficiency by requesting only what is required for each part of the workflow (vanilla trinity requires [different amounts of compute resources throughout the entire workflow](http://trinityrnaseq.github.io/performance/cpu.html))
+`trinity_phases.sh` runs trinity in 5 phases. Each phase is launched as an independent pbs script. This enhances compute efficiency by requesting only what is required for each part of the workflow (vanilla trinity requires [different amounts of compute resources throughout the entire workflow](http://trinityrnaseq.github.io/performance/cpu.html))
 
 1. trinity_1.pbs: This script performs k-mer counting with Jellyfish and is relatively fast. Stop before Inchworm step.
 
@@ -59,7 +59,7 @@ Once you have set the variables (project, list, seqtype) in __trinity_phases.sh_
 
 3. trinity_3.pbs: Perform Chrysalis, step before parallel assembly of clustered reads.
 
-4. trinity_4.pbs: Assemble clusters of reads using Inchworm, Chrysalis and Butterfly into transcripts. This step takes the longest, but contains many independant jobs that have been parallelized using GNU parallel. 
+4. trinity_4.pbs: Assemble clusters of reads using Inchworm, Chrysalis and Butterfly into transcripts. This step takes the longest, but contains many independent jobs that have been parallelized using GNU parallel. 
 
 5. trinity_5.pbs: Harvest all assembled transcripts from trinity_4 into a single multi-fasta file.
 
