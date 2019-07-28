@@ -40,7 +40,7 @@ Once you have set the variables (project, list, seqtype) in __trinity_phases.sh_
 
 ### Overview
 
-__trinity_phases.sh__ runs trinity in 5 phases. Each phase is launched as an independant pbs script. This enhances compute efficiency by requesting only what is required for each part of the workflow (vanilla trinity requires [different amounts of compute resources throughout the entire workflow](http://trinityrnaseq.github.io/performance/cpu.html))
+`trinity_phases.sh` runs trinity in 5 phases. Each phase is launched as an independant pbs script. This enhances compute efficiency by requesting only what is required for each part of the workflow (vanilla trinity requires [different amounts of compute resources throughout the entire workflow](http://trinityrnaseq.github.io/performance/cpu.html))
 
 1. trinity_1.pbs: This script performs k-mer counting with Jellyfish and is relatively fast. Stop before Inchworm step.
 
