@@ -13,7 +13,7 @@ Suggested acknowledgement: "The authors acknowledge the scientific and/or techni
 
 ## Background
 
-[Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki) assembles Illumina RNA-Seq data into transcript sequences. Trinity was developed at the Broad Institute and the Hebrew Univervity of Jerusalem. 
+[Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki) assembles Illumina RNA-Seq data into transcript sequences. Trinity was developed at the Broad Institute and the Hebrew University of Jerusalem. 
 
 SIH-Raijin-Trinity allows Trinity to be scalable by enabling use of multiple nodes on NCI Raijin. The entire workflow can complete ~4X faster using 10 broadwell nodes!
 
